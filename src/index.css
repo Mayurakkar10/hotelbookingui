@@ -1,0 +1,16 @@
+*{
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+
+.nav-link:hover{
+   border-bottom: 2px solid red;
+}
+
+.adminpanel .btn:hover{
+   background-color: black;
+   color: white;
+}
