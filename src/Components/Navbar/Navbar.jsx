@@ -41,12 +41,12 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
         </button>
         <div className="collapse navbar-collapse " id="navbarResponsive">
           <ul className="navbar-nav mx-auto  mb-2 mb-lg-0">
-            <li className="nav-item">
+            <li className="nav-item me-3">
               <NavLink className="nav-link text-dark" to="/">
                 Home
               </NavLink>
             </li>
-            <li className="nav-item">
+            <li className="nav-item me-3">
               <NavLink className="nav-link text-dark" to="/aboutus">
                 About Us
               </NavLink>
