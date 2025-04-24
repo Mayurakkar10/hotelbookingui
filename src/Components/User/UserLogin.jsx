@@ -3,50 +3,46 @@ import { useNavigate, NavLink } from "react-router-dom";
 import userService from "../../service/userService";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-export default function LoginPage({ setLogin }) {
+export default function UserLogin({ setLogin }) {
   const [form, setForm] = useState({ email: "", password: "", message: "" });
   const [validated, setValidated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  function setField(field, value) {
+  const setField = (field, value) => {
     setForm({ ...form, [field]: value });
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setValidated(true);
 
-    const { email, password } = form;
-
     userService
-      .userLogin({ email, password })
-      .then((response) => {
-        const role = response.data?.toLowerCase();
+      .userLogin({ email: form.email, password: form.password })
+      .then(({ data }) => {
+        // `data` is now an object: { role: "Owner", userId: 3 }
+        const { role: rawRole, userId } = data;
+        const role = typeof rawRole === "string" ? rawRole.toLowerCase() : null;
 
-        console.log("Login response:", role);
-
-        if (
-          role === "login failed invalid credentials" ||
-          role === "invalid" ||
-          !role
-        ) {
+        if (!role || role === "login failed invalid credentials") {
           setForm({ ...form, message: "Invalid email or password" });
-        } else {
-          setLogin(true);
-          localStorage.setItem("role", role);
-          setForm({ ...form, message: "Login successful" });
+          return;
+        }
 
-          // Replacing switch with if-else
-          if (role === "customer") {
-            navigate("/customerdashboard");
-          } else if (role === "owner") {
-            navigate("/ownerdashboard");
-          } else if (role === "admin") {
-            navigate("/admindashboard");
-          } else {
-            alert("Unknown role: " + role);
-          }
+        // SUCCESS
+        setLogin(true);
+        localStorage.setItem("role", role);
+        localStorage.setItem("userId", userId);
+        setForm({ ...form, message: "Login successful" });
+
+        if (role === "customer") {
+          navigate("/customerdashboard");
+        } else if (role === "owner") {
+          navigate("/ownerdashboard");
+        } else if (role === "admin") {
+          navigate("/admindashboard");
+        } else {
+          alert("Unknown role: " + role);
         }
       })
       .catch((error) => {
@@ -92,7 +88,6 @@ export default function LoginPage({ setLogin }) {
           />
           <div className="invalid-feedback">Password is required</div>
 
-          {/* Eye icon to toggle visibility */}
           <i
             className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}
             onClick={() => setShowPassword(!showPassword)}

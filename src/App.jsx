@@ -37,7 +37,6 @@ export default function App() {
         <Route path="/userregister" element={<UserRegister />} />
         <Route path="/adminlogin" element={<AdminLogin setLogin={handleLogin} />} />
         <Route path="/adminregister" element={<AdminRegister />} />
-        <Route path="/adminpage" element={<AdminComponent />} />
         <Route path="/hotelpage" element={<HotelPage />} />
         <Route path="/customerdashboard" element={<CustomerDashboard />} />
         <Route path="/ownerdashboard" element={<OwnerDashboard />} />
