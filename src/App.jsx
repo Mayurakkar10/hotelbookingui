@@ -16,8 +16,7 @@ import HotelPage from "./Components/Pages/HotelPage";
 import CustomerDashboard from "./Components/Dashboards/CustomerDashboard";
 import OwnerDashboard from "./Components/Dashboards/OwnerDashboard";
 import AdminDashboard from "./Components/Dashboards/AdminDashboard";
-
-
+import HotelRoomPage from "./Components/Pages/HotelRoomPage";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,14 +32,21 @@ export default function App() {
         <Route path="/" element={<HomeComponent />} />
         <Route path="/aboutus" element={<AboutUsPage />} />
         <Route path="/contactus" element={<ContactUsPage />} />
-        <Route path="/userlogin" element={<UserLogin setLogin={handleLogin} />} />
+        <Route
+          path="/userlogin"
+          element={<UserLogin setLogin={handleLogin} />}
+        />
         <Route path="/userregister" element={<UserRegister />} />
-        <Route path="/adminlogin" element={<AdminLogin setLogin={handleLogin} />} />
+        <Route
+          path="/adminlogin"
+          element={<AdminLogin setLogin={handleLogin} />}
+        />
         <Route path="/adminregister" element={<AdminRegister />} />
         <Route path="/hotelpage" element={<HotelPage />} />
         <Route path="/customerdashboard" element={<CustomerDashboard />} />
         <Route path="/ownerdashboard" element={<OwnerDashboard />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
+        <Route path="/hotelroompage/:id" element={<HotelRoomPage />}></Route>
       </Routes>
       <Footer />
     </BrowserRouter>

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { NavLink } from "react-router-dom";
 
 export default function OwnerDashboard() {
   const [hotels, setHotels] = useState([]);
+  const [allHotels, setAllHotels] = useState([]); // NEW: to keep original list
   const [isManageHotel, setIsHotelManage] = useState(false);
   const [showAddHotel, setShowAddHotel] = useState(false);
 
-  // Rooms state
   const [showRoomsModal, setShowRoomsModal] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [rooms, setRooms] = useState([]);
@@ -17,7 +18,6 @@ export default function OwnerDashboard() {
     image_url: "",
   });
 
-  // Hotel form state
   const [newHotel, setNewHotel] = useState({
     name: "",
     location: "",
@@ -26,28 +26,25 @@ export default function OwnerDashboard() {
 
   const ownerId = localStorage.getItem("userId");
 
-  // Fetch this owner's hotels
   const handleManageHotels = async () => {
     setIsHotelManage(true);
     try {
       const res = await fetch(`http://localhost:8080/hotels/owner/${ownerId}`);
       const data = await res.json();
       setHotels(data);
+      setAllHotels(data); // save original list
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Open Add Hotel modal
   const handleAddHotel = () => setShowAddHotel(true);
 
-  // Hotel form input change
   const handleHotelChange = (e) => {
     const { name, value } = e.target;
     setNewHotel((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Save new hotel
   const handleSaveHotel = async () => {
     try {
       const res = await fetch(`http://localhost:8080/addhotels/${ownerId}`, {
@@ -65,28 +62,11 @@ export default function OwnerDashboard() {
     }
   };
 
-  // When clicking a hotel row, fetch & show rooms
-  const handleRowClick = async (hotel) => {
-    setSelectedHotel(hotel);
-    try {
-      const res = await fetch(
-        `http://localhost:8080/owner/${ownerId}/hotels/${hotel.hotel_id}/rooms`
-      );
-      const data = await res.json();
-      setRooms(data);
-      setShowRoomsModal(true);
-    } catch (err) {
-      console.error("Failed to load rooms:", err);
-    }
-  };
-
-  // Room form change
   const handleRoomChange = (e) => {
     const { name, value } = e.target;
     setNewRoom((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Save new room
   const handleSaveRoom = async () => {
     try {
       const res = await fetch(
@@ -98,7 +78,7 @@ export default function OwnerDashboard() {
         }
       );
       alert(await res.text());
-      // refresh rooms
+
       const refresh = await fetch(
         `http://localhost:8080/owner/${ownerId}/hotels/${selectedHotel.hotel_id}/rooms`
       );
@@ -118,7 +98,6 @@ export default function OwnerDashboard() {
   return (
     <div className="container-fluid px-0">
       <div className="row g-0">
-        {/* Sidebar */}
         <div className="col-12 col-md-3 bg-dark text-white min-vh-100 p-3">
           <h4 className="mb-4">Owner Panel</h4>
           <button
@@ -138,11 +117,9 @@ export default function OwnerDashboard() {
           </button>
         </div>
 
-        {/* Main Panel */}
         <div className="col-12 col-md-9 p-3">
           <h2 className="mb-4">Welcome Owner</h2>
 
-          {/* Hotel Management */}
           {isManageHotel && (
             <>
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -152,13 +129,12 @@ export default function OwnerDashboard() {
                   placeholder="Search hotels..."
                   onChange={(e) => {
                     const q = e.target.value.toLowerCase();
-                    setHotels((hs) =>
-                      hs.filter(
-                        (h) =>
-                          h.name.toLowerCase().includes(q) ||
-                          h.location.toLowerCase().includes(q)
-                      )
+                    const filtered = allHotels.filter(
+                      (h) =>
+                        h.name.toLowerCase().includes(q) ||
+                        h.location.toLowerCase().includes(q)
                     );
+                    setHotels(filtered);
                   }}
                 />
                 <button className="btn btn-success" onClick={handleAddHotel}>
@@ -179,13 +155,12 @@ export default function OwnerDashboard() {
                   <tbody>
                     {hotels.length > 0 ? (
                       hotels.map((hotel) => (
-                        <tr
-                          key={hotel.hotel_id}
-                          style={{ cursor: "pointer" }}
-                          onClick={() => handleRowClick(hotel)}
-                          className="hoteltr"
-                        >
-                          <td>{hotel.name}</td>
+                        <tr key={hotel.hotel_id}>
+                          <td>
+                            <NavLink to={`/hotelroompage/${hotel.hotel_id}`}>
+                              {hotel.name}{" "}
+                            </NavLink>
+                          </td>
                           <td>{hotel.location}</td>
                           <td>{hotel.category}</td>
                           <td>{new Date(hotel.created_at).toLocaleString()}</td>
@@ -204,22 +179,19 @@ export default function OwnerDashboard() {
             </>
           )}
 
-          {/* Add Hotel Modal */}
           {showAddHotel && (
             <>
               <div
                 className="modal-backdrop fade show"
                 style={{ zIndex: 1040 }}
               />
-              <div
-                className="modal d-block fade show"
-                tabIndex="-1"
-                style={{ zIndex: 1050 }}
-              >
+              <div className="modal d-block fade show" style={{ zIndex: 1050 }}>
                 <div className="modal-dialog modal-dialog-centered">
                   <div className="modal-content">
                     <div className="modal-header">
-                      <h5 className="modal-title">Add Hotel</h5>
+                      <h5 className="modal-title w-100 text-center">
+                        Add Hotel
+                      </h5>
                       <button
                         type="button"
                         className="btn-close"
@@ -261,6 +233,16 @@ export default function OwnerDashboard() {
                           <option value="Budget">Budget</option>
                         </select>
                       </div>
+                      <div className="mb-3">
+                        <label htmlFor="formFile" className="form-label">
+                          Upload Images
+                        </label>
+                        <input
+                          className="form-control"
+                          type="file"
+                          id="formFile"
+                        />
+                      </div>
                     </div>
                     <div className="modal-footer">
                       <button
@@ -284,18 +266,13 @@ export default function OwnerDashboard() {
             </>
           )}
 
-          {/* Manage Rooms Modal */}
           {showRoomsModal && selectedHotel && (
             <>
               <div
                 className="modal-backdrop fade show"
                 style={{ zIndex: 1040 }}
               />
-              <div
-                className="modal d-block fade show"
-                tabIndex="-1"
-                style={{ zIndex: 1050 }}
-              >
+              <div className="modal d-block fade show" style={{ zIndex: 1050 }}>
                 <div className="modal-dialog modal-lg">
                   <div className="modal-content p-3">
                     <div className="modal-header">

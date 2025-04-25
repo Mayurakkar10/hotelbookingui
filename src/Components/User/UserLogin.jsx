@@ -111,7 +111,7 @@ export default function UserLogin({ setLogin }) {
           Login
         </button>
 
-        <div className="d-flex justify-content-between align-items-center mt-3">
+        {/* <div className="d-flex justify-content-between align-items-center mt-3">
           <label>
             <input type="checkbox" className="me-2" />
             Remember Me
@@ -119,7 +119,7 @@ export default function UserLogin({ setLogin }) {
           <NavLink to="/forgotpassword" className="text-primary">
             Forgot Password?
           </NavLink>
-        </div>
+        </div> */}
 
         <p className="text-center mt-3">
           Don't have an account?{" "}
