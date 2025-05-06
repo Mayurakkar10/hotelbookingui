@@ -8,7 +8,6 @@ export default function UserLogin({ setLogin }) {
   const [validated, setValidated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
   const setField = (field, value) => {
     setForm({ ...form, [field]: value });
   };
@@ -36,11 +35,11 @@ export default function UserLogin({ setLogin }) {
         setForm({ ...form, message: "Login successful" });
 
         if (role === "customer") {
-          navigate("/customerdashboard");
+          navigate(`/customerdashboard/${userId}`);
         } else if (role === "owner") {
-          navigate("/ownerdashboard");
+          navigate(`/ownerdashboard/${userId}`);
         } else if (role === "admin") {
-          navigate("/admindashboard");
+          navigate(`/admindashboard/${userId}`);
         } else {
           alert("Unknown role: " + role);
         }

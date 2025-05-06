@@ -29,7 +29,7 @@ export default function App() {
     <BrowserRouter>
       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <Routes>
-        <Route path="/" element={<HomeComponent />} />
+        <Route path="/" element={<HomeComponent isLoggedIn={isLoggedIn} />} />
         <Route path="/aboutus" element={<AboutUsPage />} />
         <Route path="/contactus" element={<ContactUsPage />} />
         <Route
@@ -42,11 +42,17 @@ export default function App() {
           element={<AdminLogin setLogin={handleLogin} />}
         />
         <Route path="/adminregister" element={<AdminRegister />} />
-        <Route path="/hotelpage" element={<HotelPage />} />
-        <Route path="/customerdashboard" element={<CustomerDashboard />} />
-        <Route path="/ownerdashboard" element={<OwnerDashboard />} />
-        <Route path="/admindashboard" element={<AdminDashboard />} />
-        <Route path="/hotelroompage/:id" element={<HotelRoomPage />}></Route>
+        <Route path="/hotelpage/:hotelId" element={<HotelPage />} />
+        <Route
+          path="/customerdashboard/:userId"
+          element={<CustomerDashboard />}
+        />
+        <Route path="/ownerdashboard/:userId" element={<OwnerDashboard />} />
+        <Route path="/admindashboard/:userId" element={<AdminDashboard />} />
+        <Route
+          path="/hotelroompage/:hotelId"
+          element={<HotelRoomPage />}
+        ></Route>
       </Routes>
       <Footer />
     </BrowserRouter>

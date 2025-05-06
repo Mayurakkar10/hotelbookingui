@@ -1,76 +1,84 @@
 import React from "react";
-import logo from "../../assets/logo.png"; // Make sure your logo path is correct
+import logo from "../../assets/logo.png"; // Ensure the logo path is correct
+import { FaUsers, FaBullseye, FaSuitcaseRolling } from "react-icons/fa";
 
 export default function AboutUsPage() {
   return (
     <div className="container py-5">
-      {/* Logo */}
+      {/* Header & Logo */}
       <div className="text-center mb-5">
         <img
           src={logo}
           alt="Book&Stay Logo"
-          style={{ width: "140px", height: "auto" }}
           className="mb-3"
+          style={{ width: "120px" }}
         />
-        <h1 className="fw-bold text-primary">About Us</h1>
-      </div>
-
-      {/* Welcome Text */}
-      <div className="text-center mb-4 px-3">
-        <h3 className="text-dark mb-3">
-          Welcome to <span className="text-primary">Book&Stay</span> – Your
-          Trusted Hotel Booking Partner!
-        </h3>
+        <h1 className="fw-bold text-primary">About Book&Stay</h1>
         <p className="lead text-muted">
-          Seamless stays, stress-free travels — that’s our promise.
+          Making travel simpler, smarter, and more joyful.
         </p>
       </div>
 
-      {/* Description */}
-      <div className="bg-light p-4 rounded shadow-sm mb-5">
-        <p style={{ fontSize: "1.2rem", textAlign: "justify" }}>
-          At <strong>Book&Stay</strong>, we believe that finding the perfect
-          place to stay should be simple, seamless, and stress-free. Whether
-          you're planning a vacation, a business trip, or a weekend getaway, our
-          platform connects you with the best hotels at the most competitive
-          prices.
-        </p>
-      </div>
+      {/* Welcome Section */}
+      <section className="mb-5">
+        <div className="bg-white rounded shadow-sm p-4">
+          <h3 className="text-center text-dark fw-semibold mb-3">
+            Welcome to <span className="text-primary">Book&Stay</span>
+          </h3>
+          <p className="text-center lead text-muted mb-0">
+            Seamless stays, stress-free travels — that’s our promise.
+          </p>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <hr className="my-5" />
 
       {/* Mission Section */}
-      <div className="text-center mb-4">
-        <h4 className="text-secondary mb-3 fw-semibold">Our Mission</h4>
-        <p
-          className="mx-auto"
-          style={{
-            maxWidth: "800px",
-            fontSize: "1.1rem",
-            textAlign: "justify",
-          }}
-        >
-          Our mission is to revolutionize the way people experience travel by
-          offering intuitive tools, trusted reviews, and top-tier hotel
-          listings. We are committed to providing exceptional service and
-          ensuring our users enjoy a hassle-free booking journey.
-        </p>
-      </div>
+      <section className="mb-5">
+        <div className="d-flex align-items-start gap-3">
+          <FaBullseye size={32} className="text-primary mt-1" />
+          <div>
+            <h4 className="text-secondary fw-bold">Our Mission</h4>
+            <p className="text-muted" style={{ textAlign: "justify" }}>
+              We aim to revolutionize the way you travel. Our platform blends
+              intuitive tools, real user reviews, and a handpicked list of top
+              hotels. We’re committed to giving you the smoothest, most reliable
+              booking experience possible.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Team Section */}
-      <div className="text-center mt-5">
-        <h4 className="text-secondary mb-3 fw-semibold">Meet Our Team</h4>
-        <p
-          className="mx-auto"
-          style={{
-            maxWidth: "800px",
-            fontSize: "1.1rem",
-            textAlign: "justify",
-          }}
-        >
-          We are a passionate group of travel enthusiasts, developers, and
-          customer experience specialists who aim to make your travel planning
-          as enjoyable as the trip itself. <span>💼 ✈️ 🌍</span>
+      <section className="mb-5">
+        <div className="d-flex align-items-start gap-3">
+          <FaUsers size={32} className="text-primary mt-1" />
+          <div>
+            <h4 className="text-secondary fw-bold">Meet Our Team</h4>
+            <p className="text-muted" style={{ textAlign: "justify" }}>
+              We’re a team of passionate developers, travel experts, and
+              hospitality lovers. Every line of code and feature we build is
+              rooted in our love for travel and commitment to your comfort.{" "}
+              <span role="img" aria-label="travel">
+                💼 ✈️ 🌍
+              </span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="text-center bg-light p-4 rounded shadow-sm mt-5">
+        <FaSuitcaseRolling size={40} className="text-primary mb-2" />
+        <h5 className="fw-bold mb-2">Ready for your next journey?</h5>
+        <p className="text-muted">
+          Discover top hotels and book your perfect stay in just a few clicks.
         </p>
-      </div>
+        <a href="/" className="btn btn-primary mt-2">
+          Explore Hotels
+        </a>
+      </section>
     </div>
   );
 }

@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import BookCard from "./HotelCard/BookCard";
-export default function BookCardList() {
+import { useNavigate } from "react-router-dom";
+
+export default function BookCardList(props) {
   const [hotelData, setHotelData] = useState([]);
   const [originalHotelData, setOriginalHotelData] = useState([]);
   const [selectRating, setSelectRating] = useState("");
   const [selectPriceRange, setSelectPriceRange] = useState("");
+  const [selectRoomType, setSelectRoomType] = useState(""); // Added room type filter (AC/Non-AC)
+  const [searchQuery, setSearchQuery] = useState("");
   const [errMsg, setErrMsg] = useState("");
+  const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchapi = async () => {
       try {
-        const response = await fetch("http://localhost:8080/getAllHotels");
+        const response = await fetch("http://localhost:8080/hotels");
         const data = await response.json();
         setHotelData(data);
         setOriginalHotelData(data);
@@ -21,22 +27,81 @@ export default function BookCardList() {
     fetchapi();
   }, []);
 
-  function handleSearch(value) {
-    const filterData = originalHotelData.filter((item) =>
-      item.name.toLowerCase().includes(value.toLowerCase())
-    );
-    setHotelData(filterData);
+  useEffect(() => {
+    filterHotels();
+  }, [searchQuery, selectRating, selectPriceRange, selectRoomType]); // Added selectRoomType to dependency array
+
+  function filterHotels() {
+    let filtered = originalHotelData;
+
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter((hotel) =>
+        hotel.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply rating filter
+    if (selectRating) {
+      const star = parseInt(selectRating[0]);
+      filtered = filtered.filter(
+        (hotel) => Math.floor(hotel.avg_rating) === star
+      );
+    }
+
+    // Apply price filter
+    if (selectPriceRange) {
+      if (selectPriceRange === "above 5000") {
+        filtered = filtered.filter((hotel) => hotel.avg_price > 5000);
+      } else {
+        const [min, max] = selectPriceRange.split("-").map(Number);
+        filtered = filtered.filter(
+          (hotel) => hotel.avg_price >= min && hotel.avg_price <= max
+        );
+      }
+    }
+
+    // Apply room type filter (AC/Non-AC)
+    if (selectRoomType) {
+      if (selectRoomType === "AC") {
+        filtered = filtered.filter((hotel) => hotel.ac_rooms > 0);
+      } else if (selectRoomType === "Non-AC") {
+        filtered = filtered.filter((hotel) => hotel.non_ac_rooms > 0);
+      }
+    }
+
+    setHotelData(filtered);
+  }
+
+  const clearFilters = () => {
+    setSelectRating("");
+    setSelectPriceRange("");
+    setSelectRoomType("");
+    setSearchQuery("");
+  };
+
+  function GotoBookings() {
+    navigate(`/customerdashboard/${userId}`);
   }
 
   return (
     <div className="container py-4">
-      <h1 className="mb-3" style={{ fontSize: "2rem" }}>
-        Find Hotels
-      </h1>
+      <div className="d-flex" style={{ justifyContent: "space-between" }}>
+        <h1 className="mb-3" style={{ fontSize: "2rem" }}>
+          Find Hotels
+        </h1>
+
+        {props.isLoggedIn && (
+          <button className="btn btn-outline-success" onClick={GotoBookings}>
+            My Bookings
+          </button>
+        )}
+      </div>
 
       <h5 className="mb-3 text-muted">
         {selectRating || "All Ratings"} -{" "}
-        {selectPriceRange || "All Price Ranges"}
+        {selectPriceRange || "All Price Ranges"} -{" "}
+        {selectRoomType || "All Room Types"}
       </h5>
       <h6 className="text-muted mb-4">{hotelData.length} hotels found</h6>
 
@@ -46,14 +111,15 @@ export default function BookCardList() {
             type="text"
             placeholder="Search Hotel..."
             className="form-control"
-            onChange={(e) => handleSearch(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <div className="col-6 col-md-3 col-lg-2">
           <select
             className="form-select"
+            value={selectRating}
             onChange={(e) => setSelectRating(e.target.value)}
-            defaultValue=""
           >
             <option disabled value="">
               Select Rating
@@ -78,6 +144,27 @@ export default function BookCardList() {
             <option>above 5000</option>
           </select>
         </div>
+        <div className="col-6 col-md-3 col-lg-2">
+          <select
+            className="form-select"
+            value={selectRoomType}
+            onChange={(e) => setSelectRoomType(e.target.value)}
+          >
+            <option disabled value="">
+              Select Room Type
+            </option>
+            <option>AC</option>
+            <option>Non-AC</option>
+          </select>
+        </div>
+        <div className="col-6 col-md-3 col-lg-2">
+          <button
+            className="btn btn-outline-secondary w-100"
+            onClick={clearFilters}
+          >
+            Clear Filters
+          </button>
+        </div>
       </div>
 
       {errMsg && <p className="text-danger mb-3">{errMsg}</p>}
@@ -85,13 +172,15 @@ export default function BookCardList() {
       <div className="row">
         {hotelData.length > 0 ? (
           hotelData.map((hotel) => (
-            <div className="col-12 col-md-6 col-lg-4 mb-4" key={hotel.id}>
+            <div className="col-12 col-md-6 col-lg-4 mb-4" key={hotel.hotel_id}>
               <BookCard
+                hotelid={hotel.hotel_id}
+                hotelRoomsAvailable={hotel.available_rooms}
                 hotelName={hotel.name}
-                hotelPrice={hotel.price}
                 hotelLocation={hotel.location}
-                hotelRoomsAvailable={hotel.roomsAvailable}
-                hotelid={hotel.id}
+                hotelImage={hotel.image_url ? hotel.image_url : null}
+                hotelPrice={hotel.avg_price}
+                hotelRating={hotel.avg_rating}
               />
             </div>
           ))

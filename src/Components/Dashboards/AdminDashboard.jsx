@@ -83,7 +83,7 @@ export default function AdminDashboard() {
           >
             View Hotels
           </button>
-          <button className="btn btn-outline-light mb-2 w-100">
+          {/* <button className="btn btn-outline-light mb-2 w-100">
             Manage Bookings
           </button>
           <button className="btn btn-outline-light mb-2 w-100">
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
           </button>
           <button className="btn btn-outline-light mb-2 w-100">
             Reviews and Ratings
-          </button>
+          </button> */}
         </div>
 
         <div className="col-12 col-md-9 p-3">
