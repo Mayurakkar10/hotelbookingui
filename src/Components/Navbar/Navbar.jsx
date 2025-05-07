@@ -7,6 +7,7 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
 
   function handleLogout() {
     navigate("/");
+    localStorage.setItem("userId", 0);
     setIsLoggedIn(!isLoggedIn);
   }
 

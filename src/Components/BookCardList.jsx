@@ -7,7 +7,7 @@ export default function BookCardList(props) {
   const [originalHotelData, setOriginalHotelData] = useState([]);
   const [selectRating, setSelectRating] = useState("");
   const [selectPriceRange, setSelectPriceRange] = useState("");
-  const [selectRoomType, setSelectRoomType] = useState(""); // Added room type filter (AC/Non-AC)
+  const [selectRoomType, setSelectRoomType] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const userId = localStorage.getItem("userId");
@@ -29,19 +29,17 @@ export default function BookCardList(props) {
 
   useEffect(() => {
     filterHotels();
-  }, [searchQuery, selectRating, selectPriceRange, selectRoomType]); // Added selectRoomType to dependency array
+  }, [searchQuery, selectRating, selectPriceRange, selectRoomType]);
 
   function filterHotels() {
     let filtered = originalHotelData;
 
-    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter((hotel) =>
         hotel.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Apply rating filter
     if (selectRating) {
       const star = parseInt(selectRating[0]);
       filtered = filtered.filter(
@@ -49,7 +47,6 @@ export default function BookCardList(props) {
       );
     }
 
-    // Apply price filter
     if (selectPriceRange) {
       if (selectPriceRange === "above 5000") {
         filtered = filtered.filter((hotel) => hotel.avg_price > 5000);
@@ -61,7 +58,6 @@ export default function BookCardList(props) {
       }
     }
 
-    // Apply room type filter (AC/Non-AC)
     if (selectRoomType) {
       if (selectRoomType === "AC") {
         filtered = filtered.filter((hotel) => hotel.ac_rooms > 0);
@@ -86,84 +82,102 @@ export default function BookCardList(props) {
 
   return (
     <div className="container py-4">
-      <div className="d-flex" style={{ justifyContent: "space-between" }}>
-        <h1 className="mb-3" style={{ fontSize: "2rem" }}>
-          Find Hotels
-        </h1>
-
-        {props.isLoggedIn && (
-          <button className="btn btn-outline-success" onClick={GotoBookings}>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="fw-bold">Find Hotels</h1>
+        {props.isLoggedIn && localStorage.getItem("role") === "customer" && (
+          <button
+            className="btn btn-success rounded-pill px-4"
+            onClick={GotoBookings}
+          >
             My Bookings
           </button>
         )}
       </div>
 
-      <h5 className="mb-3 text-muted">
-        {selectRating || "All Ratings"} -{" "}
-        {selectPriceRange || "All Price Ranges"} -{" "}
-        {selectRoomType || "All Room Types"}
-      </h5>
-      <h6 className="text-muted mb-4">{hotelData.length} hotels found</h6>
+      {/* Filters Summary */}
+      <div className="mb-3">
+        <h6 className="text-muted">
+          Filters:
+          {selectRating && (
+            <span className="badge bg-primary mx-1">{selectRating}</span>
+          )}
+          {selectPriceRange && (
+            <span className="badge bg-success mx-1">{selectPriceRange}</span>
+          )}
+          {selectRoomType && (
+            <span className="badge bg-info text-dark mx-1">
+              {selectRoomType}
+            </span>
+          )}
+          {!selectRating && !selectPriceRange && !selectRoomType && (
+            <span className="text-muted"> All Hotels</span>
+          )}
+        </h6>
+        <h6 className="text-muted">{hotelData.length} hotels found</h6>
+      </div>
 
-      <div className="row g-2 mb-4">
-        <div className="col-12 col-md-6 col-lg-4">
-          <input
-            type="text"
-            placeholder="Search Hotel..."
-            className="form-control"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <select
-            className="form-select"
-            value={selectRating}
-            onChange={(e) => setSelectRating(e.target.value)}
-          >
-            <option disabled value="">
-              Select Rating
-            </option>
-            <option>5 Star</option>
-            <option>4 Star</option>
-            <option>3 Star</option>
-          </select>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <select
-            className="form-select"
-            value={selectPriceRange}
-            onChange={(e) => setSelectPriceRange(e.target.value)}
-          >
-            <option disabled value="">
-              Select Price Range
-            </option>
-            <option>200-1000</option>
-            <option>1000-2000</option>
-            <option>2000-5000</option>
-            <option>above 5000</option>
-          </select>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <select
-            className="form-select"
-            value={selectRoomType}
-            onChange={(e) => setSelectRoomType(e.target.value)}
-          >
-            <option disabled value="">
-              Select Room Type
-            </option>
-            <option>AC</option>
-            <option>Non-AC</option>
-          </select>
-        </div>
-        <div className="col-6 col-md-3 col-lg-2">
-          <button
-            className="btn btn-outline-secondary w-100"
-            onClick={clearFilters}
-          >
-            Clear Filters
-          </button>
+      {/* Filter Controls */}
+      <div className="bg-light p-3 rounded-4 shadow-sm mb-4">
+        <div className="row g-3 align-items-end">
+          <div className="col-12 col-md-6 col-lg-4">
+            <input
+              type="text"
+              placeholder="Search Hotel..."
+              className="form-control form-control-lg"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="col-6 col-md-3 col-lg-2">
+            <select
+              className="form-select"
+              value={selectRating}
+              onChange={(e) => setSelectRating(e.target.value)}
+            >
+              <option disabled value="">
+                Select Rating
+              </option>
+              <option>5 Star</option>
+              <option>4 Star</option>
+              <option>3 Star</option>
+            </select>
+          </div>
+          <div className="col-6 col-md-3 col-lg-2">
+            <select
+              className="form-select"
+              value={selectPriceRange}
+              onChange={(e) => setSelectPriceRange(e.target.value)}
+            >
+              <option disabled value="">
+                Select Price Range
+              </option>
+              <option>200-1000</option>
+              <option>1000-2000</option>
+              <option>2000-5000</option>
+              <option>above 5000</option>
+            </select>
+          </div>
+          <div className="col-6 col-md-3 col-lg-2">
+            <select
+              className="form-select"
+              value={selectRoomType}
+              onChange={(e) => setSelectRoomType(e.target.value)}
+            >
+              <option disabled value="">
+                Select Room Type
+              </option>
+              <option>AC</option>
+              <option>Non-AC</option>
+            </select>
+          </div>
+          <div className="col-6 col-md-3 col-lg-2">
+            <button
+              className="btn btn-outline-secondary w-100"
+              onClick={clearFilters}
+            >
+              Clear Filters
+            </button>
+          </div>
         </div>
       </div>
 

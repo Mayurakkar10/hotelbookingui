@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Modal } from "react-bootstrap";
-import { FaBed, FaUsers, FaRupeeSign } from "react-icons/fa";
+import { FaBed, FaUsers, FaRupeeSign, FaMapMarkerAlt } from "react-icons/fa";
 
-const HotelPage = () => {
+const HotelBookingPage = () => {
   const { hotelId } = useParams();
   const navigate = useNavigate();
 
@@ -14,15 +14,31 @@ const HotelPage = () => {
   const [checkOut, setCheckOut] = useState("");
   const [numberOfGuests, setNumberOfGuests] = useState(1);
   const [guestDetails, setGuestDetails] = useState([
-    { name: "", age: "", id_proof_type: "", id_proof_number: "" },
+    {
+      name: "",
+      age: "",
+      id_proof_type: "",
+      id_proof_number: "",
+      gender: "",
+    },
   ]);
-  const [customerId, setCustomerId] = useState(1);
+  const [customerId, setCustomerId] = useState(null);
   const [showGuestDetailsModal, setShowGuestDetailsModal] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    setCustomerId(userId);
+    if (!userId || userId === "0") {
+      const timer = setTimeout(() => {
+        alert("Please log in to continue booking your stay. Redirecting...");
+        navigate("/userlogin");
+      }, 5000);
+      return () => clearTimeout(timer);
+    } else {
+      setCustomerId(userId);
+    }
+  }, [navigate]);
 
+  useEffect(() => {
     const fetchHotelAndRooms = async () => {
       try {
         const [hotelRes, roomsRes] = await Promise.all([
@@ -31,7 +47,14 @@ const HotelPage = () => {
         ]);
         setHotel(await hotelRes.json());
         const roomsData = await roomsRes.json();
-        setRooms(Array.isArray(roomsData) ? roomsData : roomsData.rooms || []);
+        const processedRooms = (
+          Array.isArray(roomsData) ? roomsData : roomsData.rooms || []
+        ).map((room) => {
+          const discount = Math.floor(Math.random() * 21) + 10;
+          const discountedPrice = Math.floor(room.price * (1 - discount / 100));
+          return { ...room, discount, discountedPrice };
+        });
+        setRooms(processedRooms);
       } catch (error) {
         console.error("Failed to fetch hotel or rooms:", error);
       }
@@ -57,6 +80,7 @@ const HotelPage = () => {
           age: "",
           id_proof_type: "",
           id_proof_number: "",
+          gender: "",
         }
     );
     setGuestDetails(updated);
@@ -74,7 +98,7 @@ const HotelPage = () => {
       return alert(`Max allowed guests: ${selectedRoom.max_guests}`);
 
     const nights = calculateNights();
-    const totalPrice = selectedRoom.price * nights;
+    const totalPrice = selectedRoom.discountedPrice * nights;
 
     const booking = {
       customer_id: parseInt(customerId),
@@ -116,23 +140,47 @@ const HotelPage = () => {
   };
 
   const nights = calculateNights();
-  const totalPrice = selectedRoom?.price * nights;
+  const totalPrice = selectedRoom?.discountedPrice * nights;
 
   return (
     <div className="container my-4">
-      {hotel && (
-        <div className="bg-white p-4 rounded shadow mb-4">
-          <h2 className="text-primary">{hotel.name}</h2>
-          <p className="mb-1">{hotel.description}</p>
-          <small className="text-muted">Location: {hotel.location}</small>
+      {hotel?.image_url && (
+        <div
+          className="mb-4 rounded-4 overflow-hidden shadow"
+          style={{
+            position: "relative",
+            height: "350px",
+            backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${hotel.image_url})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            color: "white",
+          }}
+        >
+          <div
+            className="p-4"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+            }}
+          >
+            <h2 className="fw-bold">{hotel.name}</h2>
+            <p className="mb-0">
+              <FaMapMarkerAlt className="me-2" />
+              {hotel.location}
+            </p>
+          </div>
         </div>
       )}
 
-      <div className="bg-white p-4 rounded shadow mb-4">
-        <h4 className="mb-3">Booking Details</h4>
-        <div className="row">
-          <div className="col-md-4 mb-3">
-            <label>Check-In</label>
+      <div className="bg-white p-4 rounded shadow mb-4 border">
+        <h4 className="mb-3 text-primary">Booking Details</h4>
+        <div className="row g-3">
+          <div className="col-md-4">
+            <label className="form-label">Check-In Date</label>
             <input
               type="date"
               className="form-control"
@@ -140,8 +188,8 @@ const HotelPage = () => {
               onChange={(e) => setCheckIn(e.target.value)}
             />
           </div>
-          <div className="col-md-4 mb-3">
-            <label>Check-Out</label>
+          <div className="col-md-4">
+            <label className="form-label">Check-Out Date</label>
             <input
               type="date"
               className="form-control"
@@ -149,8 +197,8 @@ const HotelPage = () => {
               onChange={(e) => setCheckOut(e.target.value)}
             />
           </div>
-          <div className="col-md-4 mb-3">
-            <label>Guests</label>
+          <div className="col-md-4">
+            <label className="form-label">Number of Guests</label>
             <input
               type="number"
               min={1}
@@ -162,39 +210,52 @@ const HotelPage = () => {
         </div>
       </div>
 
-      <h4 className="mb-3">Available Rooms</h4>
+      <h4 className="mb-3 text-primary">Available Rooms</h4>
       <div className="row">
         {rooms.length === 0 && <p>No rooms available.</p>}
         {rooms.map((room) => (
           <div className="col-md-6 col-lg-4" key={room.room_id}>
-            <div className="card mb-4 shadow-sm">
+            <div className="card h-100 border-0 shadow-sm rounded-4 mb-4 d-flex flex-column">
               <img
                 src={room.image_url}
-                className="card-img-top"
+                className="card-img-top rounded-top"
                 alt={room.room_type}
                 style={{ height: "180px", objectFit: "cover" }}
               />
-              <div className="card-body">
-                <h5 className="card-title">{room.room_type}</h5>
-                <p className="card-text">
-                  <FaRupeeSign /> {room.price} per night
+              <div className="card-body d-flex flex-column flex-grow-1">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h5 className="card-title mb-0">{room.room_type}</h5>
+                  <span
+                    className={`badge ${
+                      room.availability_status === "Available"
+                        ? "bg-success"
+                        : "bg-danger"
+                    }`}
+                  >
+                    {room.availability_status}
+                  </span>
+                </div>
+                <p className="mb-1 text-success">
+                  <FaRupeeSign /> {room.discountedPrice} / night
+                  <span className="text-muted text-decoration-line-through ms-2 small">
+                    ₹{room.price}
+                  </span>
+                  <span className="badge bg-warning text-dark ms-2">
+                    {room.discount}%
+                  </span>
                 </p>
-                <p>
-                  <FaBed /> Beds: {room.bed_count}, <FaUsers /> Max Guests:{" "}
+                <p className="text-muted small mb-2">
+                  <FaBed /> Beds: {room.bed_count} | <FaUsers /> Max:{" "}
                   {room.max_guests}
                 </p>
-                <p>
-                  Status: <strong>{room.availability_status}</strong>
-                </p>
-                {room.amenities?.length > 0 && (
-                  <ul className="small text-muted">
-                    {room.amenities.map((a, i) => (
-                      <li key={i}>{a}</li>
-                    ))}
-                  </ul>
-                )}
+
+                <ul className="list-unstyled small mt-2">
+                  {room.amenities?.map((a, i) => (
+                    <li key={i}>• {a}</li>
+                  ))}
+                </ul>
                 <button
-                  className="btn btn-primary w-100 mt-2"
+                  className="btn btn-outline-primary w-100 mt-auto"
                   onClick={() => {
                     setSelectedRoom(room);
                     setShowGuestDetailsModal(true);
@@ -217,35 +278,45 @@ const HotelPage = () => {
           <Modal.Title>Confirm Booking</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="mb-3">
-            <h5>Booking Summary</h5>
-            <p>
-              <strong>Room:</strong> {selectedRoom?.room_type}
-            </p>
-            <p>
-              <strong>Dates:</strong> {checkIn} to {checkOut}
-            </p>
-            <p>
-              <strong>Guests:</strong> {numberOfGuests}
-            </p>
-            <p>
-              <strong>Price/Night:</strong> ₹{selectedRoom?.price}
-            </p>
-            <p>
-              <strong>Total Nights:</strong> {nights}
-            </p>
-            <p>
-              <strong>Total Price:</strong> ₹{totalPrice}
-            </p>
+          <div className="mb-4">
+            <h5 className="text-primary">Booking Summary</h5>
+            <div className="row">
+              <div className="col-md-6">
+                <p>
+                  <strong>Room:</strong> {selectedRoom?.room_type}
+                </p>
+                <p>
+                  <strong>Guests:</strong> {numberOfGuests}
+                </p>
+                <p>
+                  <strong>Dates:</strong> {checkIn} to {checkOut}
+                </p>
+              </div>
+              <div className="col-md-6">
+                <p>
+                  <strong>Price/Night:</strong> ₹{selectedRoom?.discountedPrice}
+                  <span className="text-muted text-decoration-line-through ms-2 small">
+                    ₹{selectedRoom?.price}
+                  </span>{" "}
+                  ({selectedRoom?.discount}% off)
+                </p>
+                <p>
+                  <strong>Total Nights:</strong> {nights}
+                </p>
+                <p>
+                  <strong>Total Price:</strong> ₹{totalPrice}
+                </p>
+              </div>
+            </div>
           </div>
           <hr />
-          <h5>Guest Information</h5>
+          <h5 className="text-primary mb-3">Guest Information</h5>
           {guestDetails.map((guest, idx) => (
             <div key={idx} className="border rounded p-3 mb-3 bg-light">
-              <strong>Guest #{idx + 1}</strong>
+              <h6>Guest #{idx + 1}</h6>
               <input
                 type="text"
-                placeholder="Name"
+                placeholder="Full Name"
                 value={guest.name}
                 onChange={(e) =>
                   handleGuestDetailChange(idx, "name", e.target.value)
@@ -263,6 +334,18 @@ const HotelPage = () => {
               />
               <select
                 className="form-control my-1"
+                value={guest.gender}
+                onChange={(e) =>
+                  handleGuestDetailChange(idx, "gender", e.target.value)
+                }
+              >
+                <option value="">Select Gender</option>
+                <option value="0">Male</option>
+                <option value="1">Female</option>
+                <option value="2">Other</option>
+              </select>
+              <select
+                className="form-control my-1"
                 value={guest.id_proof_type}
                 onChange={(e) =>
                   handleGuestDetailChange(idx, "id_proof_type", e.target.value)
@@ -276,7 +359,7 @@ const HotelPage = () => {
               </select>
               <input
                 type="text"
-                placeholder="ID Number"
+                placeholder="ID Proof Number"
                 value={guest.id_proof_number}
                 onChange={(e) =>
                   handleGuestDetailChange(
@@ -306,4 +389,4 @@ const HotelPage = () => {
   );
 };
 
-export default HotelPage;
+export default HotelBookingPage;

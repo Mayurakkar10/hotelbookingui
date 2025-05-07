@@ -12,11 +12,12 @@ import UserRegister from "./Components/User/UserRegister";
 import AdminLogin from "./Components/HotelAdmin/AdminLogin";
 import AdminRegister from "./Components/HotelAdmin/AdminRegister";
 import AdminComponent from "./Components/HotelAdmin/AdminComponent";
-import HotelPage from "./Components/Pages/HotelPage";
+import HotelBookingPage from "./Components/Pages/HotelBookingPage";
 import CustomerDashboard from "./Components/Dashboards/CustomerDashboard";
 import OwnerDashboard from "./Components/Dashboards/OwnerDashboard";
 import AdminDashboard from "./Components/Dashboards/AdminDashboard";
 import HotelRoomPage from "./Components/Pages/HotelRoomPage";
+import { MdLocalHospital } from "react-icons/md";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -24,7 +25,6 @@ export default function App() {
   const handleLogin = (value) => {
     setIsLoggedIn(value);
   };
-
   return (
     <BrowserRouter>
       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
@@ -42,7 +42,7 @@ export default function App() {
           element={<AdminLogin setLogin={handleLogin} />}
         />
         <Route path="/adminregister" element={<AdminRegister />} />
-        <Route path="/hotelpage/:hotelId" element={<HotelPage />} />
+        <Route path="/hotelpage/:hotelId" element={<HotelBookingPage />} />
         <Route
           path="/customerdashboard/:userId"
           element={<CustomerDashboard />}
