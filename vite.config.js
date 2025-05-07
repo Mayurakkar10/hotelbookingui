@@ -9,3 +9,4 @@ export default defineConfig({
     host: true, // This exposes the server to external requests (required for Railway)
   }
 })
+
