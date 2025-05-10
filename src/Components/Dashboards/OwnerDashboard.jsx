@@ -1,3 +1,613 @@
+// import React, { useState } from "react";
+// import "bootstrap-icons/font/bootstrap-icons.css";
+// import { NavLink } from "react-router-dom";
+
+// export default function OwnerDashboard() {
+//   const [hotels, setHotels] = useState([]);
+//   const [allHotels, setAllHotels] = useState([]);
+//   const [isManageHotel, setIsHotelManage] = useState(false);
+//   const [isManageBookings, setIsManageBookings] = useState(false);
+//   const [showAddHotel, setShowAddHotel] = useState(false);
+//   const [isEditMode, setIsEditMode] = useState(false);
+//   const [bookings, setBookings] = useState([]);
+//   const [currentHotelPage, setCurrentHotelPage] = useState(1);
+//   const [currentBookingPage, setCurrentBookingPage] = useState(1);
+//   const itemsPerPage = 5;
+
+//   const [newHotel, setNewHotel] = useState({
+//     hotel_id: null,
+//     name: "",
+//     location: "",
+//     category: "Luxury",
+//     image_url: "",
+//     numberOfBeds: 1,
+//     maxGuests: 1,
+//     description: "",
+//   });
+
+//   const ownerId = localStorage.getItem("userId");
+
+//   const handleManageHotels = async () => {
+//     setIsManageBookings(false);
+//     setIsHotelManage(true);
+//     try {
+//       const res = await fetch(`http://localhost:8080/hotels/owner/${ownerId}`);
+//       const data = await res.json();
+//       setHotels(data);
+//       setAllHotels(data);
+//       setCurrentHotelPage(1);
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   const handleManageBookings = async () => {
+//     setIsHotelManage(false);
+//     setIsManageBookings(true);
+//     try {
+//       const res = await fetch(
+//         `http://localhost:8080/bookings/owner/${ownerId}`
+//       );
+//       const data = await res.json();
+//       setBookings(data);
+//       setCurrentBookingPage(1);
+//     } catch (err) {
+//       console.error("Failed to fetch bookings:", err);
+//     }
+//   };
+
+//   const handleAddHotel = () => {
+//     setIsEditMode(false);
+//     setNewHotel({
+//       hotel_id: null,
+//       name: "",
+//       location: "",
+//       category: "Luxury",
+//       image_url: "",
+//       numberOfBeds: 1,
+//       maxGuests: 1,
+//       description: "",
+//     });
+//     setShowAddHotel(true);
+//   };
+
+//   const handleEditHotel = (hotel) => {
+//     setIsEditMode(true);
+//     setNewHotel(hotel);
+//     setShowAddHotel(true);
+//   };
+
+//   const handleDeleteHotel = async (hotelId) => {
+//     if (window.confirm("Are you sure you want to delete this hotel?")) {
+//       try {
+//         await fetch(`http://localhost:8080/deleteHotelById/${hotelId}`, {
+//           method: "DELETE",
+//         });
+//         alert("Hotel deleted.");
+//         handleManageHotels();
+//       } catch (err) {
+//         console.error(err);
+//         alert("Failed to delete hotel.");
+//       }
+//     }
+//   };
+
+//   const handleHotelChange = (e) => {
+//     const { name, value } = e.target;
+//     setNewHotel((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const paginate = (data, currentPage) =>
+//     data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+//   const totalHotelPages = Math.ceil(hotels.length / itemsPerPage);
+//   const totalBookingPages = Math.ceil(bookings.length / itemsPerPage);
+
+//   return (
+//     <div className="container-fluid px-0">
+//       <div className="row g-0">
+//         <div className="col-md-3 bg-dark text-white min-vh-100 p-3">
+//           <h4 className="mb-4">Owner Panel</h4>
+//           <button
+//             className="btn btn-outline-light mb-2 w-100"
+//             onClick={handleManageHotels}
+//           >
+//             Manage Hotels
+//           </button>
+//           <button
+//             className="btn btn-outline-light w-100"
+//             onClick={handleManageBookings}
+//           >
+//             Manage Bookings
+//           </button>
+//         </div>
+
+//         <div className="col-md-9 p-3">
+//           <h2 className="mb-4">Welcome Owner</h2>
+
+//           {isManageHotel && (
+//             <>
+//               <div className="d-flex justify-content-between align-items-center mb-3">
+//                 <input
+//                   type="search"
+//                   className="form-control w-75 shadow-sm rounded"
+//                   placeholder="Search hotels..."
+//                   onChange={(e) => {
+//                     const q = e.target.value.toLowerCase();
+//                     const filtered = allHotels.filter(
+//                       (h) =>
+//                         h.name.toLowerCase().includes(q) ||
+//                         h.location.toLowerCase().includes(q)
+//                     );
+//                     setHotels(filtered);
+//                     setCurrentHotelPage(1);
+//                   }}
+//                 />
+//                 <button className="btn btn-success" onClick={handleAddHotel}>
+//                   <i className="bi bi-plus-lg"></i> Add Hotel
+//                 </button>
+//               </div>
+
+//               <div className="table-responsive">
+//                 <table className="table table-striped border">
+//                   <thead className="table-dark">
+//                     <tr>
+//                       <th>Name</th>
+//                       <th>Location</th>
+//                       <th>Category</th>
+//                       <th>Description</th>
+//                       <th>Created At</th>
+//                       <th>Actions</th>
+//                     </tr>
+//                   </thead>
+//                   <tbody>
+//                     {paginate(hotels, currentHotelPage).map((hotel) => (
+//                       <tr key={hotel.hotel_id}>
+//                         <td>
+//                           <NavLink to={`/hotelroompage/${hotel.hotel_id}`}>
+//                             {hotel.name}
+//                           </NavLink>
+//                         </td>
+//                         <td>{hotel.location}</td>
+//                         <td>{hotel.category}</td>
+//                         <td>{hotel.description}</td>
+//                         <td>{new Date(hotel.created_at).toLocaleString()}</td>
+//                         <td>
+//                           <button
+//                             className="btn btn-sm btn-warning me-2"
+//                             onClick={() => handleEditHotel(hotel)}
+//                           >
+//                             Edit
+//                           </button>
+//                           <button
+//                             className="btn btn-sm btn-danger"
+//                             onClick={() => handleDeleteHotel(hotel.hotel_id)}
+//                           >
+//                             Delete
+//                           </button>
+//                         </td>
+//                       </tr>
+//                     ))}
+//                     {hotels.length === 0 && (
+//                       <tr>
+//                         <td colSpan="6" className="text-center">
+//                           No Hotels Found
+//                         </td>
+//                       </tr>
+//                     )}
+//                   </tbody>
+//                 </table>
+//               </div>
+
+//               <div className="d-flex justify-content-center mt-2">
+//                 {Array.from({ length: totalHotelPages }, (_, i) => (
+//                   <button
+//                     key={i}
+//                     className={`btn btn-sm mx-1 ${
+//                       currentHotelPage === i + 1
+//                         ? "btn-primary"
+//                         : "btn-outline-primary"
+//                     }`}
+//                     onClick={() => setCurrentHotelPage(i + 1)}
+//                   >
+//                     {i + 1}
+//                   </button>
+//                 ))}
+//               </div>
+//             </>
+//           )}
+
+//           {isManageBookings && (
+//             <>
+//               <h4>All Bookings</h4>
+//               <div className="table-responsive">
+//                 <table className="table table-bordered">
+//                   <thead className="table-dark">
+//                     <tr>
+//                       <th>Booking ID</th>
+//                       <th>Hotel</th>
+//                       <th>Room</th>
+//                       <th>Customer</th>
+//                       <th>Check-In</th>
+//                       <th>Check-Out</th>
+//                       <th>Total Price</th>
+//                       <th>Status</th>
+//                     </tr>
+//                   </thead>
+//                   <tbody>
+//                     {paginate(bookings, currentBookingPage).map((b) => (
+//                       <tr key={b.booking_id}>
+//                         <td>{b.booking_id}</td>
+//                         <td>{b.hotel_name || b.hotel_id}</td>
+//                         <td>{b.room_id || b.room_type}</td>
+//                         <td>{b.customer_id || b.customer_name}</td>
+//                         <td>
+//                           {new Date(b.check_in_date).toLocaleDateString()}
+//                         </td>
+//                         <td>
+//                           {new Date(b.check_out_date).toLocaleDateString()}
+//                         </td>
+//                         <td>₹{b.total_price}</td>
+//                         <td>{b.booking_status}</td>
+//                       </tr>
+//                     ))}
+//                     {bookings.length === 0 && (
+//                       <tr>
+//                         <td colSpan="8" className="text-center">
+//                           No bookings found.
+//                         </td>
+//                       </tr>
+//                     )}
+//                   </tbody>
+//                 </table>
+//               </div>
+
+//               <div className="d-flex justify-content-center mt-2">
+//                 {Array.from({ length: totalBookingPages }, (_, i) => (
+//                   <button
+//                     key={i}
+//                     className={`btn btn-sm mx-1 ${
+//                       currentBookingPage === i + 1
+//                         ? "btn-primary"
+//                         : "btn-outline-primary"
+//                     }`}
+//                     onClick={() => setCurrentBookingPage(i + 1)}
+//                   >
+//                     {i + 1}
+//                   </button>
+//                 ))}
+//               </div>
+//             </>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// import React, { useState, useEffect } from "react";
+// import "bootstrap-icons/font/bootstrap-icons.css";
+// import { NavLink } from "react-router-dom";
+// import { Line } from "react-chartjs-2";
+// import { Chart as ChartJS } from "chart.js/auto"; // Automatically includes required chart components
+
+// export default function OwnerDashboard() {
+//   const [hotels, setHotels] = useState([]);
+//   const [allHotels, setAllHotels] = useState([]);
+//   const [isManageHotel, setIsHotelManage] = useState(false);
+//   const [isManageBookings, setIsManageBookings] = useState(false);
+//   const [showAddHotel, setShowAddHotel] = useState(false);
+//   const [isEditMode, setIsEditMode] = useState(false);
+//   const [bookings, setBookings] = useState([]);
+//   const [currentHotelPage, setCurrentHotelPage] = useState(1);
+//   const [currentBookingPage, setCurrentBookingPage] = useState(1);
+//   const itemsPerPage = 5;
+
+//   const [newHotel, setNewHotel] = useState({
+//     hotel_id: null,
+//     name: "",
+//     location: "",
+//     category: "Luxury",
+//     image_url: "",
+//     numberOfBeds: 1,
+//     maxGuests: 1,
+//     description: "",
+//   });
+
+//   const ownerId = localStorage.getItem("userId");
+
+//   const handleManageHotels = async () => {
+//     setIsManageBookings(false);
+//     setIsHotelManage(true);
+//     try {
+//       const res = await fetch(`http://localhost:8080/hotels/owner/${ownerId}`);
+//       const data = await res.json();
+//       setHotels(data);
+//       setAllHotels(data);
+//       setCurrentHotelPage(1);
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   const handleManageBookings = async () => {
+//     setIsHotelManage(false);
+//     setIsManageBookings(true);
+//     try {
+//       const res = await fetch(
+//         `http://localhost:8080/bookings/owner/${ownerId}`
+//       );
+//       const data = await res.json();
+//       setBookings(data);
+//       setCurrentBookingPage(1);
+//     } catch (err) {
+//       console.error("Failed to fetch bookings:", err);
+//     }
+//   };
+
+//   const handleAddHotel = () => {
+//     setIsEditMode(false);
+//     setNewHotel({
+//       hotel_id: null,
+//       name: "",
+//       location: "",
+//       category: "Luxury",
+//       image_url: "",
+//       numberOfBeds: 1,
+//       maxGuests: 1,
+//       description: "",
+//     });
+//     setShowAddHotel(true);
+//   };
+
+//   const handleEditHotel = (hotel) => {
+//     setIsEditMode(true);
+//     setNewHotel(hotel);
+//     setShowAddHotel(true);
+//   };
+
+//   const handleDeleteHotel = async (hotelId) => {
+//     if (window.confirm("Are you sure you want to delete this hotel?")) {
+//       try {
+//         await fetch(`http://localhost:8080/deleteHotelById/${hotelId}`, {
+//           method: "DELETE",
+//         });
+//         alert("Hotel deleted.");
+//         handleManageHotels();
+//       } catch (err) {
+//         console.error(err);
+//         alert("Failed to delete hotel.");
+//       }
+//     }
+//   };
+
+//   const handleHotelChange = (e) => {
+//     const { name, value } = e.target;
+//     setNewHotel((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const paginate = (data, currentPage) =>
+//     data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+//   const totalHotelPages = Math.ceil(hotels.length / itemsPerPage);
+//   const totalBookingPages = Math.ceil(bookings.length / itemsPerPage);
+
+//   // Dummy data for the chart
+//   const chartData = {
+//     labels: ["January", "February", "March", "April", "May", "June", "July"],
+//     datasets: [
+//       {
+//         label: "Hotel Bookings",
+//         data: [65, 59, 80, 81, 56, 55, 40],
+//         borderColor: "rgba(75, 192, 192, 1)",
+//         fill: false,
+//       },
+//     ],
+//   };
+
+//   return (
+//     <div className="container-fluid px-0">
+//       <div className="row g-0">
+//         <div className="col-md-3 bg-dark text-white min-vh-100 p-3">
+//           <h4 className="mb-4">Owner Panel</h4>
+//           <button
+//             className="btn btn-outline-light mb-2 w-100"
+//             onClick={() => {
+//               setIsManageBookings(false);
+//               setIsHotelManage(false); // Reset both management views
+//             }}
+//           >
+//             Dashboard
+//           </button>
+//           <button
+//             className="btn btn-outline-light mb-2 w-100"
+//             onClick={handleManageHotels}
+//           >
+//             Manage Hotels
+//           </button>
+//           <button
+//             className="btn btn-outline-light w-100"
+//             onClick={handleManageBookings}
+//           >
+//             Manage Bookings
+//           </button>
+//         </div>
+
+//         <div className="col-md-9 p-3">
+//           <h2 className="mb-4">Welcome Owner</h2>
+
+//           {/* Display chart dashboard initially */}
+//           {!isManageHotel && !isManageBookings && (
+//             <div className="d-flex justify-content-center align-items-center">
+//               <h4>Hotel Bookings Overview</h4>
+//               <div style={{ width: "80%", height: "400px" }}>
+//                 <Line data={chartData} />
+//               </div>
+//             </div>
+//           )}
+
+//           {/* Manage Hotels Section */}
+//           {isManageHotel && (
+//             <>
+//               <div className="d-flex justify-content-between align-items-center mb-3">
+//                 <input
+//                   type="search"
+//                   className="form-control w-75 shadow-sm rounded"
+//                   placeholder="Search hotels..."
+//                   onChange={(e) => {
+//                     const q = e.target.value.toLowerCase();
+//                     const filtered = allHotels.filter(
+//                       (h) =>
+//                         h.name.toLowerCase().includes(q) ||
+//                         h.location.toLowerCase().includes(q)
+//                     );
+//                     setHotels(filtered);
+//                     setCurrentHotelPage(1);
+//                   }}
+//                 />
+//                 <button className="btn btn-success" onClick={handleAddHotel}>
+//                   <i className="bi bi-plus-lg"></i> Add Hotel
+//                 </button>
+//               </div>
+
+//               <div className="table-responsive">
+//                 <table className="table table-striped border">
+//                   <thead className="table-dark">
+//                     <tr>
+//                       <th>Name</th>
+//                       <th>Location</th>
+//                       <th>Category</th>
+//                       <th>Description</th>
+//                       <th>Created At</th>
+//                       <th>Actions</th>
+//                     </tr>
+//                   </thead>
+//                   <tbody>
+//                     {paginate(hotels, currentHotelPage).map((hotel) => (
+//                       <tr key={hotel.hotel_id}>
+//                         <td>
+//                           <NavLink to={`/hotelroompage/${hotel.hotel_id}`}>
+//                             {hotel.name}
+//                           </NavLink>
+//                         </td>
+//                         <td>{hotel.location}</td>
+//                         <td>{hotel.category}</td>
+//                         <td>{hotel.description}</td>
+//                         <td>{new Date(hotel.created_at).toLocaleString()}</td>
+//                         <td>
+//                           <button
+//                             className="btn btn-sm btn-warning me-2"
+//                             onClick={() => handleEditHotel(hotel)}
+//                           >
+//                             Edit
+//                           </button>
+//                           <button
+//                             className="btn btn-sm btn-danger"
+//                             onClick={() => handleDeleteHotel(hotel.hotel_id)}
+//                           >
+//                             Delete
+//                           </button>
+//                         </td>
+//                       </tr>
+//                     ))}
+//                     {hotels.length === 0 && (
+//                       <tr>
+//                         <td colSpan="6" className="text-center">
+//                           No Hotels Found
+//                         </td>
+//                       </tr>
+//                     )}
+//                   </tbody>
+//                 </table>
+//               </div>
+
+//               <div className="d-flex justify-content-center mt-2">
+//                 {Array.from({ length: totalHotelPages }, (_, i) => (
+//                   <button
+//                     key={i}
+//                     className={`btn btn-sm mx-1 ${
+//                       currentHotelPage === i + 1
+//                         ? "btn-primary"
+//                         : "btn-outline-primary"
+//                     }`}
+//                     onClick={() => setCurrentHotelPage(i + 1)}
+//                   >
+//                     {i + 1}
+//                   </button>
+//                 ))}
+//               </div>
+//             </>
+//           )}
+
+//           {/* Manage Bookings Section */}
+//           {isManageBookings && (
+//             <>
+//               <h4>All Bookings</h4>
+//               <div className="table-responsive">
+//                 <table className="table table-bordered">
+//                   <thead className="table-dark">
+//                     <tr>
+//                       <th>Booking ID</th>
+//                       <th>Hotel</th>
+//                       <th>Room</th>
+//                       <th>Customer</th>
+//                       <th>Check-In</th>
+//                       <th>Check-Out</th>
+//                       <th>Total Price</th>
+//                       <th>Status</th>
+//                     </tr>
+//                   </thead>
+//                   <tbody>
+//                     {paginate(bookings, currentBookingPage).map((b) => (
+//                       <tr key={b.booking_id}>
+//                         <td>{b.booking_id}</td>
+//                         <td>{b.hotel_name || b.hotel_id}</td>
+//                         <td>{b.room_id || b.room_type}</td>
+//                         <td>{b.customer_id || b.customer_name}</td>
+//                         <td>
+//                           {new Date(b.check_in_date).toLocaleDateString()}
+//                         </td>
+//                         <td>
+//                           {new Date(b.check_out_date).toLocaleDateString()}
+//                         </td>
+//                         <td>₹{b.total_price}</td>
+//                         <td>{b.booking_status}</td>
+//                       </tr>
+//                     ))}
+//                     {bookings.length === 0 && (
+//                       <tr>
+//                         <td colSpan="8" className="text-center">
+//                           No bookings found.
+//                         </td>
+//                       </tr>
+//                     )}
+//                   </tbody>
+//                 </table>
+//               </div>
+
+//               <div className="d-flex justify-content-center mt-2">
+//                 {Array.from({ length: totalBookingPages }, (_, i) => (
+//                   <button
+//                     key={i}
+//                     className={`btn btn-sm mx-1 ${
+//                       currentBookingPage === i + 1
+//                         ? "btn-primary"
+//                         : "btn-outline-primary"
+//                     }`}
+//                     onClick={() => setCurrentBookingPage(i + 1)}
+//                   >
+//                     {i + 1}
+//                   </button>
+//                 ))}
+//               </div>
+//             </>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
 import React, { useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { NavLink } from "react-router-dom";
@@ -15,10 +625,10 @@ export default function OwnerDashboard() {
     hotel_id: null,
     name: "",
     location: "",
-    category: "",
+    category: "Luxury",
     image_url: "",
-    numberOfBeds: 1, // New property for number of beds
-    maxGuests: 1, // New property for max number of guests
+    numberOfBeds: 1,
+    maxGuests: 1,
   });
 
   const ownerId = localStorage.getItem("userId");
@@ -56,10 +666,11 @@ export default function OwnerDashboard() {
       hotel_id: null,
       name: "",
       location: "",
-      category: "",
+      category: "Luxury",
       image_url: "",
       numberOfBeds: 1, // Reset to default value
       maxGuests: 1, // Reset to default value
+      description: "",
     });
     setShowAddHotel(true);
   };
@@ -134,7 +745,8 @@ export default function OwnerDashboard() {
         category: "",
         image_url: "",
         numberOfBeds: 1, // Reset after save
-        maxGuests: 1, // Reset after save
+        maxGuests: 1,
+        description: "", // Reset after save
       });
       handleManageHotels();
     } catch (err) {
@@ -194,6 +806,7 @@ export default function OwnerDashboard() {
                       <th>Name</th>
                       <th>Location</th>
                       <th>Category</th>
+                      <th>Description</th>
                       <th>Created At</th>
                       <th>Actions</th>
                     </tr>
@@ -209,6 +822,7 @@ export default function OwnerDashboard() {
                           </td>
                           <td>{hotel.location}</td>
                           <td>{hotel.category}</td>
+                          <td>{hotel.description}</td>
                           <td>{new Date(hotel.created_at).toLocaleString()}</td>
                           <td>
                             <button
@@ -396,7 +1010,17 @@ export default function OwnerDashboard() {
                           />
                         </div>
                       )}
+                      <div className="mb-3">
+                        <label className="form-label">Description</label>
+                        <textarea
+                          className="form-control"
+                          name="description"
+                          value={newHotel.description}
+                          onChange={handleHotelChange}
+                        />
+                      </div>
                     </div>
+
                     <div className="modal-footer">
                       <button
                         type="button"

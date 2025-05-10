@@ -1,21 +1,20 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import userService from "../../service/userService";
-import { useNavigate } from "react-router-dom";
+
 export default function UserRegister() {
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
     phone: "",
   });
+
   const navigate = useNavigate();
   const [errors, setErrors] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
     phone: "",
   });
 
@@ -46,14 +45,6 @@ export default function UserRegister() {
       isValid = false;
     }
 
-    if (!form.confirmPassword) {
-      formErrors.confirmPassword = "Confirm Password is required";
-      isValid = false;
-    } else if (form.confirmPassword !== form.password) {
-      formErrors.confirmPassword = "Passwords do not match";
-      isValid = false;
-    }
-
     const phonePattern = /^[0-9]{10}$/;
     if (!form.phone) {
       formErrors.phone = "Phone number is required";
@@ -77,24 +68,23 @@ export default function UserRegister() {
         email,
         password,
         phone,
-        role_id: 1, //by default 1
+        role_id: 1, // default role
       };
 
       userService
         .userRegister(payload)
         .then((response) => {
           console.log("User registered successfully:", response.data);
-          alert("User Registerd Successfully");
+          alert("User Registered Successfully");
           navigate("/userlogin");
         })
         .catch((error) => {
           console.error("Error registering user:", error);
-          alert("invalid input");
+          alert("Invalid input");
           setForm({
             name: "",
             email: "",
             password: "",
-            confirmPassword: "",
             phone: "",
           });
         });
@@ -149,22 +139,6 @@ export default function UserRegister() {
           />
           {errors.password && (
             <div className="invalid-feedback">{errors.password}</div>
-          )}
-        </div>
-
-        <div className="mb-3">
-          <input
-            type="password"
-            className={`form-control ${
-              errors.confirmPassword ? "is-invalid" : ""
-            }`}
-            placeholder="Confirm Password"
-            value={form.confirmPassword}
-            onChange={(e) => setField("confirmPassword", e.target.value)}
-            required
-          />
-          {errors.confirmPassword && (
-            <div className="invalid-feedback">{errors.confirmPassword}</div>
           )}
         </div>
 

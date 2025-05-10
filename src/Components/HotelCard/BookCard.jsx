@@ -48,13 +48,13 @@ export default function BookCard(props) {
             ))}
           </small>
           <div className="mb-2">
-            <span className="badge bg-danger">25% OFF</span>
+            <span className="badge bg-danger">upto 25% OFF</span>
           </div>
         </div>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <span className="fw-semibold">
             <FaRupeeSign className="me-1" />
-            {props.hotelPrice}
+            {Math.floor(props.hotelPrice)}
           </span>
           <span className="text-primary fw-semibold">Book Now</span>
         </div>

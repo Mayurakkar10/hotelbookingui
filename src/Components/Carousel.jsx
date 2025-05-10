@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import { VscTriangleRight, VscTriangleLeft } from "react-icons/vsc";
 
 const images = [
-  "https://img.freepik.com/premium-photo/grand-hotel-lobby-with-polished-marble-floors-tall-windows-elegant-furniture_1022970-45482.jpg?ga=GA1.1.1464861887.1734063462&semt=ais_hybrid&w=740",
-  "https://img.freepik.com/premium-photo/luxurious-hotel-lobby-with-marble-floor_1369729-40414.jpg?ga=GA1.1.1464861887.1734063462&semt=ais_hybrid&w=740",
-  "https://img.freepik.com/free-photo/hammocks-umbrellas-placed-row_1203-185.jpg?ga=GA1.1.1464861887.1734063462&semt=ais_hybrid&w=740",
+  "https://plus.unsplash.com/premium_photo-1661964071015-d97428970584?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8bHV4dXJ5JTIwaG90ZWx8ZW58MHx8MHx8fDA%3D",
+  "https://img.freepik.com/premium-photo/luxurious-hotel-lobby-with-marble-floor_1369729-40414.jpg?ga=GA1.1.1464861887.1734063462&semt=ais_hybrid&w=1000",
+  "https://img.freepik.com/free-photo/hammocks-umbrellas-placed-row_1203-185.jpg?ga=GA1.1.1464861887.1734063462&semt=ais_hybrid&w=1000",
+  "https://img.freepik.com/free-vector/horizontal-sale-banner-template-hotel-business_23-2150245693.jpg?t=st=1746678679~exp=1746682279~hmac=ec99dd9e05d19e8b3c977b9921069a5d6dd29ddf1de4e940fc68387e2c380e71&w=1380",
+  "https://img.freepik.com/free-vector/travel-sale-landing-page-with-photo_23-2148628259.jpg?t=st=1746678635~exp=1746682235~hmac=b50d815062f0ba34eae17e918cbfebe01a695866e2574f7ac892138555a980f5&w=1380",
+  "https://cdn.smartslider3.com/wp-content/uploads/slider/cache/2246430895b9002bd1db7616d566b283/slide2.jpg",
 ];
 
 const Carousel = () => {

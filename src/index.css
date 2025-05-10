@@ -16,4 +16,10 @@
 }
 
 
+body {
+   background-color: #f8f9fa; /* Light gray background */
+   margin: 0;
+   font-family: 'Segoe UI', sans-serif;
+ }
+
  

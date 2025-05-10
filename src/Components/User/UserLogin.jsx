@@ -32,10 +32,11 @@ export default function UserLogin({ setLogin }) {
         setLogin(true);
         localStorage.setItem("role", role);
         localStorage.setItem("userId", userId);
+        alert("login success");
         setForm({ ...form, message: "Login successful" });
 
         if (role === "customer") {
-          navigate(`/customerdashboard/${userId}`);
+          navigate(`/`);
         } else if (role === "owner") {
           navigate(`/ownerdashboard/${userId}`);
         } else if (role === "admin") {

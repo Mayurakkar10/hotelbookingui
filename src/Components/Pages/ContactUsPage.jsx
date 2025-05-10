@@ -27,7 +27,7 @@ export default function ContactUsPage() {
               <FaPhoneAlt className="text-primary me-3 mt-1" size={20} />
               <div>
                 <h6 className="mb-1">Phone</h6>
-                <p className="text-muted mb-0">+1 (234) 567-8901</p>
+                <p className="text-muted mb-0">+91 8766947403</p>
               </div>
             </div>
 
@@ -35,7 +35,7 @@ export default function ContactUsPage() {
               <FaEnvelope className="text-primary me-3 mt-1" size={20} />
               <div>
                 <h6 className="mb-1">Email</h6>
-                <p className="text-muted mb-0">support@bookandstay.com</p>
+                <p className="text-muted mb-0">bookandstayteam@gmail.com</p>
               </div>
             </div>
 

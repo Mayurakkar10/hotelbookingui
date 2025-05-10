@@ -18,7 +18,6 @@ import OwnerDashboard from "./Components/Dashboards/OwnerDashboard";
 import AdminDashboard from "./Components/Dashboards/AdminDashboard";
 import HotelRoomPage from "./Components/Pages/HotelRoomPage";
 import { MdLocalHospital } from "react-icons/md";
-
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 

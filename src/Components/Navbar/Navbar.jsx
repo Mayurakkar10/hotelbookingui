@@ -27,7 +27,8 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
           to="/"
           style={{ fontSize: "2rem", fontWeight: "bold" }}
         >
-          <span className="text-danger">B</span>ook&Stay
+          <span className="text-danger">B</span>ook&
+          <span className="text-danger">S</span>tay
         </NavLink>
         <button
           className="navbar-toggler"
