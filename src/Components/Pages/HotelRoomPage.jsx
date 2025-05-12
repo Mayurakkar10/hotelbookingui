@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function HotelRoomManagement() {
   const { hotelId } = useParams();
   const [rooms, setRooms] = useState([]);
   const [showRoomModal, setShowRoomModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
   const roomTypes = [
     { id: 1, label: "Single" },
     { id: 2, label: "Double" },
@@ -154,6 +155,12 @@ export default function HotelRoomManagement() {
       <div className="row g-0">
         <div className="col-12 col-md-3 bg-dark text-white min-vh-100 p-3">
           <h4 className="mb-4">Room Management</h4>
+          <button
+            className="btn btn-outline-light mb-2 w-100"
+            onClick={() => navigate(`/ownerdashboard/${userId}}`)}
+          >
+            Goto Dashboard
+          </button>
         </div>
 
         <div className="col-12 col-md-9 p-4">

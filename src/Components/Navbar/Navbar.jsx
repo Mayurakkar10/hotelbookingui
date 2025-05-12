@@ -6,15 +6,26 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
   let navigate = useNavigate();
 
   function handleLogout() {
+    handleNavLinkClick();
     navigate("/");
     localStorage.setItem("userId", 0);
     setIsLoggedIn(!isLoggedIn);
   }
+  const handleNavLinkClick = () => {
+    const bsCollapse = document.getElementById("navbarResponsive");
+    if (bsCollapse && bsCollapse.classList.contains("show")) {
+      new window.bootstrap.Collapse(bsCollapse).hide();
+    }
+  };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-body-primary border-bottom">
-      <div className="container">
-        <NavLink className="navbar-brand" to="/" style={{ fontSize: "2rem" }}>
+    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">
+      <div className="container ">
+        <NavLink
+          className="navbar-brand"
+          to="/"
+          style={{ fontSize: "2rem", fontWeight: "bold" }}
+        >
           <img
             src={logo}
             alt="Logo"
@@ -42,19 +53,34 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse " id="navbarResponsive">
-          <ul className="navbar-nav mx-auto  mb-2 mb-lg-0">
+          <ul className="navbar-nav mx-auto d-flex flex-column flex-md-row justify-content-center align-content-center  mb-2 mb-lg-0 ">
             <li className="nav-item me-3">
-              <NavLink className="nav-link text-dark" to="/">
+              <NavLink
+                className="nav-link text-dark"
+                to="/"
+                onClick={handleNavLinkClick}
+                style={{ fontWeight: "bold" }}
+              >
                 Home
               </NavLink>
             </li>
             <li className="nav-item me-3">
-              <NavLink className="nav-link text-dark" to="/aboutus">
+              <NavLink
+                className="nav-link text-dark"
+                to="/aboutus"
+                onClick={handleNavLinkClick}
+                style={{ fontWeight: "bold" }}
+              >
                 About Us
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link text-dark" to="/contactus">
+              <NavLink
+                className="nav-link text-dark"
+                to="/contactus"
+                onClick={handleNavLinkClick}
+                style={{ fontWeight: "bold" }}
+              >
                 Contact Us
               </NavLink>
             </li>
@@ -64,7 +90,11 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
               Logout
             </button>
           ) : (
-            <NavLink className="btn btn-danger" to="/userlogin">
+            <NavLink
+              className="btn btn-danger"
+              to="/userlogin"
+              onClick={handleNavLinkClick}
+            >
               Login/Register
             </NavLink>
           )}

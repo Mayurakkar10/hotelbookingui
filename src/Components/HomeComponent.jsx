@@ -6,7 +6,10 @@ export default function HomeComponent(props) {
   return (
     <div>
       <Carousel />
-      <BookCardList isLoggedIn={props.isLoggedIn} />
+      <BookCardList
+        isLoggedIn={props.isLoggedIn}
+        style={{ backgroundColor: "#F2F2F2" }}
+      />
       <HotelQuote />
     </div>
   );

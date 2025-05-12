@@ -54,7 +54,7 @@ export default function BookCard(props) {
         <div className="d-flex justify-content-between align-items-center mb-3">
           <span className="fw-semibold">
             <FaRupeeSign className="me-1" />
-            {Math.floor(props.hotelPrice)}
+            starting from {Math.floor(props.hotelPrice) || 300}
           </span>
           <span className="text-primary fw-semibold">Book Now</span>
         </div>
