@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import { FaBed, FaUsers, FaRupeeSign, FaMapMarkerAlt } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import Swal from "sweetalert2";
+import baseUrl from "../../baseUrl";
 const HotelBookingPage = () => {
   const { hotelId } = useParams();
   const navigate = useNavigate();
@@ -26,7 +27,13 @@ const HotelBookingPage = () => {
     const userId = localStorage.getItem("userId");
     if (!userId || userId === "0") {
       const timer = setTimeout(() => {
-        alert("Please log in to continue booking your stay. Redirecting...");
+        Swal.fire({
+          title: "Please log in",
+          text: "To continue booking your stay, please log in.",
+          icon: "warning",
+          showCancelButton: false,
+          confirmButtonText: "OK",
+        });
         navigate("/userlogin");
       }, 3000);
       return () => clearTimeout(timer);
@@ -39,8 +46,8 @@ const HotelBookingPage = () => {
     const fetchHotelAndRooms = async () => {
       try {
         const [hotelRes, roomsRes] = await Promise.all([
-          fetch(`http://localhost:8080/hotel/${hotelId}`),
-          fetch(`http://localhost:8080/hotel/${hotelId}/rooms`),
+          fetch(`${baseUrl}/hotel/${hotelId}`),
+          fetch(`${baseUrl}/hotel/${hotelId}/rooms`),
         ]);
         setHotel(await hotelRes.json());
         const roomsData = await roomsRes.json();
@@ -89,9 +96,19 @@ const HotelBookingPage = () => {
 
   const handleBooking = async () => {
     if (!checkIn || !checkOut || !selectedRoom)
-      return alert("Fill all details.");
+      return Swal.fire({
+        title: "Missing Details",
+        text: "Please fill all details.",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
     if (numberOfGuests > selectedRoom.max_guests)
-      return alert(`Max allowed guests: ${selectedRoom.max_guests}`);
+      return Swal.fire({
+        title: "Guests Exceed Limit",
+        text: `Max allowed guests: ${selectedRoom.max_guests}`,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
 
     const nights = calculateNights();
     const totalPrice = selectedRoom.discountedPrice * nights;
@@ -113,13 +130,18 @@ const HotelBookingPage = () => {
         (g) => !g.name || !g.age || !g.id_proof_type || !g.id_proof_number
       )
     ) {
-      return alert("Please fill all guest details.");
+      return Swal.fire({
+        title: "Missing Details",
+        text: "Please fill all guest details.",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
     }
 
     setIsBooking(true); // Start loading
 
     try {
-      const res = await fetch("http://localhost:8080/addBooking", {
+      const res = await fetch(`${baseUrl}/addBooking`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(booking),
@@ -130,7 +152,7 @@ const HotelBookingPage = () => {
       if (!bookingId) throw new Error("Booking ID not returned.");
 
       for (const guest of guestDetails) {
-        await fetch(`http://localhost:8080/booking/${bookingId}/addGuest`, {
+        await fetch(`${baseUrl}/booking/${bookingId}/addGuest`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(guest),
@@ -142,7 +164,12 @@ const HotelBookingPage = () => {
       console.log(data);
     } catch (err) {
       console.error("Booking failed:", err);
-      alert("Booking failed.");
+      Swal.fire({
+        title: "Booking Failed",
+        text: "Something went wrong. Please try again later.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     } finally {
       setIsBooking(false); // Stop loading
     }

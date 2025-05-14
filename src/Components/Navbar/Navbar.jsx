@@ -2,11 +2,20 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import Swal from "sweetalert2";
+
 export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
   let navigate = useNavigate();
 
   function handleLogout() {
     handleNavLinkClick();
+    Swal.fire({
+      icon: "success",
+      title: "Logged Out",
+      text: "You have been successfully logged out.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
     navigate("/");
     localStorage.setItem("userId", 0);
     setIsLoggedIn(!isLoggedIn);

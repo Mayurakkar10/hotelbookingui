@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import baseUrl from "../../baseUrl";
 
 export default function HotelRoomManagement() {
   const { hotelId } = useParams();
@@ -43,7 +44,7 @@ export default function HotelRoomManagement() {
 
   const fetchRooms = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/hotel/${hotelId}/rooms`);
+      const res = await fetch(`${baseUrl}/hotel/${hotelId}/rooms`);
       const data = await res.json();
       setRooms(data);
     } catch (err) {
@@ -90,7 +91,7 @@ export default function HotelRoomManagement() {
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await fetch("http://localhost:8080/roomimages/uploadImage", {
+      const res = await fetch(`${baseUrl}/roomimages/uploadImage`, {
         method: "POST",
         body: formData,
       });
@@ -129,7 +130,7 @@ export default function HotelRoomManagement() {
   const handleDeleteRoom = async (roomId) => {
     if (window.confirm("Are you sure you want to delete this room?")) {
       try {
-        await fetch(`http://localhost:8080/deleteRoomById/${roomId}`, {
+        await fetch(`${baseUrl}/deleteRoomById/${roomId}`, {
           method: "DELETE",
         });
         alert("Room deleted");

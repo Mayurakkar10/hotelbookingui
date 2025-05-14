@@ -3,17 +3,12 @@ import { useNavigate, NavLink } from "react-router-dom";
 import userService from "../../service/userService";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import logo from "../../assets/logo.png";
+import Swal from "sweetalert2";
 
 export default function UserLogin({ setLogin }) {
   const [form, setForm] = useState({ email: "", password: "", message: "" });
   const [validated, setValidated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState({
-    title: "",
-    message: "",
-    isSuccess: true,
-  });
 
   const navigate = useNavigate();
   const setField = (field, value) => {
@@ -40,34 +35,34 @@ export default function UserLogin({ setLogin }) {
 
         localStorage.setItem("role", role);
         localStorage.setItem("userId", userId);
-        setModalContent({
+
+        Swal.fire({
+          icon: "success",
           title: "Login Successful",
-          message: "You have logged in successfully!",
-          isSuccess: true,
+          text: "Welcome back!",
+          confirmButtonColor: "#4CAF50",
         });
-        setShowModal(true);
 
         setForm({ ...form, message: "Login successful" });
 
         setLogin(true);
-        setTimeout(() => {
-          if (role === "customer") {
-            navigate(`/`);
-          } else if (role === "owner") {
-            navigate(`/ownerdashboard/${userId}`);
-          } else if (role === "admin") {
-            navigate(`/admindashboard/${userId}`);
-          }
-        }, 3000);
+
+        if (role === "customer") {
+          navigate(`/`);
+        } else if (role === "owner") {
+          navigate(`/ownerdashboard/${userId}`);
+        } else if (role === "admin") {
+          navigate(`/admindashboard/${userId}`);
+        }
       })
       .catch((error) => {
         console.error("Login Error:", error);
-        setModalContent({
+        Swal.fire({
+          icon: "error",
           title: "Login Failed",
-          message: "An error occurred during login",
-          isSuccess: false,
+          text: "Invalid username or password. Please try again.",
+          confirmButtonColor: "#d33",
         });
-        setShowModal(true);
         setForm({ ...form, message: "An error occurred during login" });
       });
   };
@@ -144,54 +139,6 @@ export default function UserLogin({ setLogin }) {
           </NavLink>
         </p>
       </form>
-
-      {showModal && (
-        <>
-          <>
-            <div className="modal-backdrop fade show"></div>
-            <div className="modal d-block fade show" tabIndex="-1">
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content shadow-lg border-0 rounded-4">
-                  <div
-                    className={`modal-header ${
-                      modalContent.isSuccess ? "bg-success" : "bg-danger"
-                    } text-white rounded-top-4`}
-                  >
-                    <h5 className="modal-title mx-auto">
-                      {modalContent.title}
-                    </h5>
-                  </div>
-
-                  <div className="modal-body text-center py-4">
-                    <i
-                      className={`bi ${
-                        modalContent.isSuccess
-                          ? "bi-check-circle-fill"
-                          : "bi-exclamation-triangle-fill"
-                      } fs-1 ${
-                        modalContent.isSuccess ? "text-success" : "text-danger"
-                      } mb-3`}
-                    ></i>
-                    <p className="fs-5">{modalContent.message}</p>
-                    {modalContent.isSuccess && (
-                      <p className="text-muted">Redirecting....</p>
-                    )}
-                  </div>
-
-                  <div className="modal-footer border-0 px-4 pb-4">
-                    <button
-                      className="btn btn-outline-secondary w-100 rounded-pill"
-                      onClick={() => setShowModal(false)}
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        </>
-      )}
     </div>
   );
 }

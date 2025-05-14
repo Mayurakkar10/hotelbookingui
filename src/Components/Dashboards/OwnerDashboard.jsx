@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { NavLink } from "react-router-dom";
-
+import Swal from "sweetalert2";
+import baseUrl from "../../baseUrl";
 export default function OwnerDashboard() {
   const [hotels, setHotels] = useState([]);
   const [view, setView] = useState("dashboard");
@@ -25,14 +26,13 @@ export default function OwnerDashboard() {
   });
 
   const ownerId = localStorage.getItem("userId");
-  // already imported React, but just ensuring
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const [hotelsRes, bookingsRes] = await Promise.all([
-          fetch(`http://localhost:8080/hotels/owner/${ownerId}`),
-          fetch(`http://localhost:8080/bookings/owner/${ownerId}`),
+          fetch(`${baseUrl}/hotels/owner/${ownerId}`),
+          fetch(`${baseUrl}/bookings/owner/${ownerId}`),
         ]);
 
         const hotelsData = await hotelsRes.json();
@@ -87,14 +87,25 @@ export default function OwnerDashboard() {
   const handleDeleteHotel = async (hotelId) => {
     if (window.confirm("Are you sure you want to delete this hotel?")) {
       try {
-        await fetch(`http://localhost:8080/deleteHotelById/${hotelId}`, {
+        await fetch(`${baseUrl}/deleteHotelById/${hotelId}`, {
           method: "DELETE",
         });
-        alert("Hotel deleted.");
+        Swal.fire({
+          icon: "success",
+          title: "Hotel Deleted",
+          text: "The hotel has been deleted successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
         handleManageHotels();
       } catch (err) {
         console.error(err);
-        alert("Failed to delete hotel.");
+        Swal.fire({
+          icon: "error",
+          title: "Deletion Failed",
+          text: "Failed to delete the hotel. Please try again.",
+        });
       }
     }
   };
@@ -109,7 +120,7 @@ export default function OwnerDashboard() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8080/hotelimage/uploadImage", {
+      const res = await fetch(`${baseUrl}/hotelimage/uploadImage`, {
         method: "POST",
         body: formData,
       });
@@ -122,13 +133,18 @@ export default function OwnerDashboard() {
 
   const handleSaveHotel = async () => {
     if (!newHotel.image_url) {
-      alert("Please upload an image before saving.");
+      Swal.fire({
+        icon: "warning",
+        title: "Image Required",
+        text: "Please upload an image before saving.",
+      });
+
       return;
     }
 
     const url = isEditMode
-      ? `http://localhost:8080/updateHotelById${newHotel.hotel_id}`
-      : `http://localhost:8080/addHotels/${ownerId}`;
+      ? `${baseUrl}/updateHotelById${newHotel.hotel_id}`
+      : `${baseUrl}/addHotels/${ownerId}`;
 
     const method = isEditMode ? "PUT" : "POST";
 
@@ -139,7 +155,13 @@ export default function OwnerDashboard() {
         body: JSON.stringify(newHotel),
       });
 
-      alert(await res.text());
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: isEditMode
+          ? "Hotel updated successfully"
+          : "Hotel added successfully",
+      });
       setShowAddHotel(false);
       setNewHotel({
         hotel_id: null,
@@ -154,7 +176,55 @@ export default function OwnerDashboard() {
       handleManageHotels();
     } catch (err) {
       console.error(err);
-      alert("Failed to save hotel");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to save hotel. Please try again.",
+      });
+    }
+  };
+
+  const handleCheckOut = async (bookingId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to check out this booking?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, check out",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+    try {
+      const res = await fetch(`${baseUrl}/checkout/${bookingId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ booking_status: "Checkedout" }),
+      });
+
+      if (res.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Checked out successfully",
+        });
+        const updatedBookings = await fetch(
+          `${baseUrl}/bookings/owner/${ownerId}`
+        );
+        const bookingsData = await updatedBookings.json();
+        setBookings(bookingsData);
+      } else {
+        throw new Error("Failed to check out");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to check out. Please try again.",
+      });
     }
   };
 
@@ -323,6 +393,7 @@ export default function OwnerDashboard() {
                       <th>Check-Out</th>
                       <th>Total Price</th>
                       <th>Status</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -341,6 +412,20 @@ export default function OwnerDashboard() {
                           </td>
                           <td>₹{b.total_price}</td>
                           <td>{b.booking_status}</td>
+                          <td>
+                            {b.booking_status === "Checkedout" ? (
+                              <button disabled className="btn btn-secondary">
+                                Checked Out
+                              </button>
+                            ) : (
+                              <button
+                                className="btn btn-danger"
+                                onClick={() => handleCheckOut(b.booking_id)}
+                              >
+                                CheckOut
+                              </button>
+                            )}
+                          </td>
                         </tr>
                       ))
                     ) : (

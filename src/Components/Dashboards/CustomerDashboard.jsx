@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-
+import Swal from "sweetalert2";
+import baseUrl from "../../baseUrl";
 export default function CustomerDashboard() {
   const [bookings, setBookings] = useState([]);
   const [activeReviewId, setActiveReviewId] = useState(null);
@@ -11,7 +12,7 @@ export default function CustomerDashboard() {
   useEffect(() => {
     const fetchBookings = async () => {
       const response = await fetch(
-        `http://localhost:8080/bookings/customer/${customer_id}`
+        `${baseUrl}/bookings/customer/${customer_id}`
       );
       const data = await response.json();
       setBookings(data);
@@ -21,7 +22,7 @@ export default function CustomerDashboard() {
   }, [customer_id]);
 
   const handleReviewSubmit = async (bookingId) => {
-    const response = await fetch(`http://localhost:8080/${bookingId}/review`, {
+    const response = await fetch(`${baseUrl}/${bookingId}/review`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -43,6 +44,49 @@ export default function CustomerDashboard() {
     }
   };
 
+  const handleCheckOut = async (bookingId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to check out this booking?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, check out",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+    try {
+      const res = await fetch(`${baseUrl}/checkout/${bookingId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ booking_status: "Checkedout" }),
+      });
+
+      if (res.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Checked out successfully",
+        });
+        const updatedBookings = await fetch(
+          `${baseUrl}/bookings/owner/${customer_id}`
+        );
+        const bookingsData = await updatedBookings.json();
+        setBookings(bookingsData);
+      } else {
+        throw new Error("Failed to check out");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to check out. Please try again.",
+      });
+    }
+  };
   const statusBadgeClass = (status) => {
     switch (status.toLowerCase()) {
       case "confirmed":
@@ -73,8 +117,8 @@ export default function CustomerDashboard() {
           <p className="text-muted">You have no bookings at the moment.</p>
         ) : (
           <div className="table-responsive">
-            <table className="table table-hover align-middle">
-              <thead className="table-light">
+            <table className="table table-hover align-middle table-bordered">
+              <thead className="table-primary">
                 <tr>
                   <th>Hotel</th>
                   <th>Room Type</th>
@@ -83,6 +127,7 @@ export default function CustomerDashboard() {
                   <th>Price</th>
                   <th>Status</th>
                   <th>Review</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,6 +197,20 @@ export default function CustomerDashboard() {
                           onClick={() => setActiveReviewId(booking.booking_id)}
                         >
                           Add Review
+                        </button>
+                      )}
+                    </td>
+                    <td>
+                      {booking.status === "Checkedout" ? (
+                        <button disabled className="btn btn-secondary">
+                          Checked Out
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => handleCheckOut(booking.booking_id)}
+                        >
+                          CheckOut
                         </button>
                       )}
                     </td>

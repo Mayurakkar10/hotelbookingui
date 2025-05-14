@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import baseUrl from "../../baseUrl";
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [hotels, setHotels] = useState([]);
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:8080/getallusers");
+      const response = await fetch(`${baseUrl}/getallusers`);
       const data = await response.json();
       setUsers(data);
       setTotalUsers(data.length);
@@ -37,7 +37,7 @@ export default function AdminDashboard() {
 
   const fetchHotels = async () => {
     try {
-      const response = await fetch("http://localhost:8080/getAllHotels");
+      const response = await fetch(`${baseUrl}/getAllHotels`);
       const data = await response.json();
       setHotels(data);
       setTotalHotels(data.length);
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   const fetchBookings = async () => {
     try {
-      const response = await fetch("http://localhost:8080/getAllBookings");
+      const response = await fetch(`${baseUrl}/getAllBookings`);
       const data = await response.json();
       setBookings(data);
       setTotalBookings(data.length);
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   const deleteUser = async (id) => {
     alert("Do you Really want to delete this user?");
     try {
-      const response = await fetch(`http://localhost:8080/deleteuser/${id}`, {
+      const response = await fetch(`${baseUrl}/deleteuser/${id}`, {
         method: "DELETE",
       });
 
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
 
   const handleSaveOwner = async () => {
     try {
-      const response = await fetch("http://localhost:8080/addUsers", {
+      const response = await fetch(`${baseUrl}/addUsers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -331,9 +331,9 @@ export default function AdminDashboard() {
                       bookings.map((b) => (
                         <tr key={b.booking_id}>
                           <td>{b.booking_id}</td>
-                          <td>{b.hotel_name || b.hotel_id}</td>
-                          <td>{b.room_type || b.room_id}</td>
-                          <td>{b.customer_id || b.customer_name}</td>
+                          <td>{b.hotelName}</td>
+                          <td>{b.roomType}</td>
+                          <td>{b.customerName}</td>
                           <td>
                             {new Date(b.check_in_date).toLocaleDateString()}
                           </td>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import BookCard from "./HotelCard/BookCard";
 import { useNavigate } from "react-router-dom";
-
+import { FaMapMarkerAlt } from "react-icons/fa";
+import baseUrl from "../baseUrl";
 export default function BookCardList(props) {
   const [hotelData, setHotelData] = useState([]);
   const [originalHotelData, setOriginalHotelData] = useState([]);
@@ -9,18 +10,17 @@ export default function BookCardList(props) {
   const [selectPriceRange, setSelectPriceRange] = useState("");
   const [selectRoomType, setSelectRoomType] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectLocation, setSelectLocation] = useState("");
   const [errMsg, setErrMsg] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
   const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
-
   useEffect(() => {
     const fetchapi = async () => {
       try {
-        const response = await fetch("http://localhost:8080/hotels");
+        const response = await fetch(`${baseUrl}/hotels`);
         const data = await response.json();
         setHotelData(data);
         setOriginalHotelData(data);
@@ -33,14 +33,22 @@ export default function BookCardList(props) {
 
   useEffect(() => {
     filterHotels();
-  }, [searchQuery, selectRating, selectPriceRange, selectRoomType]);
+  }, [
+    searchQuery,
+    selectRating,
+    selectPriceRange,
+    selectRoomType,
+    selectLocation,
+  ]);
 
   function filterHotels() {
     let filtered = originalHotelData;
 
     if (searchQuery) {
-      filtered = filtered.filter((hotel) =>
-        hotel.name.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        (hotel) =>
+          hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -79,6 +87,7 @@ export default function BookCardList(props) {
     setSelectPriceRange("");
     setSelectRoomType("");
     setSearchQuery("");
+    setSelectLocation("");
   };
 
   function GotoBookings() {
@@ -133,7 +142,7 @@ export default function BookCardList(props) {
           <div className="col-12 col-md-6 col-lg-4">
             <input
               type="text"
-              placeholder="🔍 Search Hotel..."
+              placeholder="🔍 Search Hotel Name, Location"
               className="form-control form-control-lg border-primary-subtle"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -153,6 +162,7 @@ export default function BookCardList(props) {
               <option>3 Star</option>
             </select>
           </div>
+
           <div className="col-6 col-md-3 col-lg-2">
             <select
               className="form-select border-info-subtle"
